@@ -30,15 +30,15 @@ public class BaselineCoreferenceSystem implements CoreferenceSystem{
       List<Entity> clusters = pair.getSecond();
       List<Mention> mentions = doc.getMentions();
       //--Print the Document
-//      System.out.println(doc.prettyPrint(clusters));
+      System.out.println(doc.prettyPrint(clusters));
       //--Iterate over mentions
       for(Mention m : mentions){
-//        System.out.println(m);
+        System.out.println(m);
       }
       //--Iterate Over Coreferent Mention Pairs
       for(Entity e : clusters){
         for(Pair<Mention, Mention> mentionPair : e.orderedMentionPairs()){
-//          System.out.println(""+mentionPair.getFirst() + " and " + mentionPair.getSecond() + " are coreferent");
+          System.out.println(""+mentionPair.getFirst() + " and " + mentionPair.getSecond() + " are coreferent");
         }
       }
     }
