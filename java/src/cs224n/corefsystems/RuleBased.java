@@ -120,7 +120,50 @@ public class RuleBased implements CoreferenceSystem {
           }
         } 
       }
-    } 
+    }
+    System.out.println("\n\n\n-----------------------------HERE LIE THE EXPERIMENTS !!!!!!!!!!!!!");
+    HashMap<String, List<Mention>> ppn = new HashMap<String, List<Mention>>();
+    for (Mention m : doc.getMentions()) {
+      Sentence s = m.sentence; 
+      for (int i = m.beginIndexInclusive; i < m.endIndexExclusive; i++) {
+        Sentence.Token t = s.tokens.get(i);
+        String  w = s.words.get(i);
+        if (t.isProperNoun()) {
+          if (ppn.containsKey(w)) {
+            ppn.get(w).add(m);
+          } else {
+            ppn.put(w, new ArrayList<Mention>());
+            ppn.get(w).add(m);
+          }
+        }
+      }
+    }
+    for (String w : ppn.keySet()) {
+      if (ppn.get(w).size() > 1) {
+        System.out.println(w);
+        System.out.println(ppn.get(w));
+        System.out.println("---");
+        HashSet<Entity> toMerge = new HashSet<Entity>();
+        for (Mention mProp : ppn.get(w)) {
+          toMerge.add(mentions.get(mProp).entity); 
+        }
+        while (toMerge.size() > 1) { 
+          Entity mergeInto = null;
+          for (Entity e : toMerge) {
+            if (mergeInto == null) {
+              mergeInto = e;
+              continue;
+            }
+            List<Mentions> eMentions = e.mentions();  
+            for (Mention eMention : eMentions) {
+              eMention.removeCoreference();
+              mentions.put(eMention, eMention.markCoreferent(mergeInto));
+            }
+          }
+        } 
+      }
+    }
+    System.out.println("EXPERIMENTS ARE OVEERRRRR ------------------------\n\n\n");
     List<ClusteredMention> mentionList = new ArrayList<ClusteredMention>();
     mentionList.addAll(mentions.values());
     HashSet<Entity> entities = new HashSet<Entity>();
