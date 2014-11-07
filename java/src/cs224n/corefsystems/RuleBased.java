@@ -149,16 +149,19 @@ public class RuleBased implements CoreferenceSystem {
         }
         while (toMerge.size() > 1) { 
           Entity mergeInto = null;
-          for (Entity e : toMerge) {
+          HashSet<Entity> toMergeCopy = new HashSet<Entity>();
+          toMergeCopy.addAll(toMerge);
+          for (Entity e : toMergeCopy) {
             if (mergeInto == null) {
               mergeInto = e;
               continue;
             }
-            List<Mentions> eMentions = e.mentions();  
+            Set<Mention> eMentions = e.mentions;  
             for (Mention eMention : eMentions) {
               eMention.removeCoreference();
               mentions.put(eMention, eMention.markCoreferent(mergeInto));
             }
+            toMerge.remove(e);
           }
         } 
       }
