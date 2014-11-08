@@ -185,10 +185,12 @@ public class RuleBased implements CoreferenceSystem {
   private Boolean isAntecedent(Mention m, Mention neighborMention) {
     if (Pronoun.isSomePronoun(neighborMention.gloss())) {
       if (neighborMention.gloss().equals(m.gloss()) || ( Util.haveGenderAndAreSameGender(m, neighborMention).getSecond() &&
-                                                         Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond())) {
+                                                         Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond() && Util.areSamePerson(m, neighborMention))) {
         return true;
       }
     } else if (Util.haveGenderAndAreSameGender(m, neighborMention).getSecond() && Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond()) {
+      return true;
+    } else if (Util.bothGenderNeutral(m, neighborMention) && Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond()) {
       return true;
     }
     return false;

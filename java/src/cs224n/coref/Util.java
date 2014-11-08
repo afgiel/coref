@@ -31,6 +31,28 @@ public class Util {
     return Pair.make(false, false);
   }
 
+  public static boolean bothGenderNeutral(Mention a, Mention b) {
+    //(names)
+    Name nameA = Name.get(a.gloss());
+    Name nameB = Name.get(b.gloss());
+    //(pronouns)
+    Pronoun proA = Pronoun.valueOrNull(a.gloss().toUpperCase().replaceAll(" ", "_"));
+    Pronoun proB = Pronoun.valueOrNull(b.gloss().toUpperCase().replaceAll(" ", "_"));
+    //(error conditions)
+    if(nameA == null && proA == null){ return false; } 
+    Gender genderA = proA == null ? nameA.gender : proA.gender;
+    if(nameB == null && proB == null){ return !genderA.isAnimate(); }
+    //(compare genders)
+    Gender genderB = proB == null ? nameB.gender : proB.gender;
+    return (!genderA.isAnimate() && !genderB.isAnimate()); 
+  }
+
+  public static boolean areSamePerson(Mention a, Mention b) { 
+    Pronoun proA = Pronoun.valueOrNull(a.gloss().toUpperCase().replaceAll(" ", "_"));
+    Pronoun proB = Pronoun.valueOrNull(b.gloss().toUpperCase().replaceAll(" ", "_"));
+    return proA.speaker == proB.speaker;
+  }
+
   public static Pair<Boolean,Boolean> haveNumberAndAreSameNumber(Mention a, Mention b){
     //(names)
     boolean nounA = a.headToken().isNoun();
