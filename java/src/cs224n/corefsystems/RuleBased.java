@@ -41,10 +41,11 @@ public class RuleBased implements CoreferenceSystem {
      *    - The mentionsClusterMap is updated so that all cluster assignments are accurate map.
      */
     clusterByExactMatch(doc);
-    //clusterByHeadWordMatch(doc);
-    clusterByHeadWordLemmaMatch(doc);
-    //clusterByProperNounWordMatches(doc);
+    clusterByHeadWordMatch(doc);
     clusterPronouns(doc);
+
+    //clusterByHeadWordLemmaMatch(doc);
+    //clusterByProperNounWordMatches(doc);
 
     return mentionsMapToClusterList();
   }

@@ -31,12 +31,13 @@ public class ClassifierBased implements CoreferenceSystem {
 
 		  Feature.ExactMatch.class,
       Feature.HeadWordLemmaMatch.class,
+			Pair.make(Feature.Antecedent.class, Feature.MentionDistance.class),
+
       //Feature.BothPronouns.class,
       //Feature.OnePronoun.class,
       //Feature.Antecedent.class,
       //Feature.SentenceDistance.class,
       //Feature.MentionDistance.class,
-			Pair.make(Feature.Antecedent.class, Feature.MentionDistance.class),
 
 			//skeleton for how to create a pair feature
 			//Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
