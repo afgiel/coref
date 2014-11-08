@@ -26,32 +26,14 @@ public class RuleBased implements CoreferenceSystem {
 
 	@Override
 	public void train(Collection<Pair<Document, List<Entity>>> trainingData) {
-    headMatches = new HashMap<String, List<String>>(); 
-    for (Pair<Document, List<Entity>> trainPair : trainingData) {
-      for (Entity entity : trainPair.getSecond()) {
-        for (Pair<Mention, Mention> mentionPair : entity.orderedMentionPairs()) {
-          String first = mentionPair.getFirst().headWord();
-          String second = mentionPair.getSecond().headWord();
-          if (headMatches.containsKey(first)) {
-            headMatches.get(first).add(second);
-          } else {
-            List<String> list = new ArrayList<String>();
-            list.add(second);
-            headMatches.put(first, list);
-          }
-        }
-      }
-    }
-   masculine = new HashSet<String>(Arrays.asList("Mr.", "he", "his", "him")); 
-   feminine = new HashSet<String>(Arrays.asList("Mrs.", "Ms.", "she", "her")); 
-   firstPerson = new HashSet<String>(Arrays.asList("I", "me", "mine", "my")); 
-   secondPerson = new HashSet<String>(Arrays.asList("you", "your", "yours")); 
+    // This is rule-based and thus no training performed
 	}
 
 	@Override
 	public List<ClusteredMention> runCoreference(Document doc) {
 	  mentionsClusterMap = new HashMap<Mention, ClusteredMention>();
 
+    // Guarantees first condition of the sieve pass invariant
     markAllSingleton(doc);
     /* Begin passing through mentions using rules with decreasingly less precision.
      * Each pass must maintain the following invariant:
@@ -86,10 +68,6 @@ public class RuleBased implements CoreferenceSystem {
         if (mentionStringMap.containsKey(mentionString)) {
           Entity e = mentionStringMap.get(mentionString);
           mergeClusters(mentionsClusterMap.get(m).entity, e);
-          /*
-          hwClusters.put(m.headWord().toLowerCase(), newEntity);
-          lClusters.put(m.sentence.lemmas.get(m.headWordIndex), newEntity);
-          */
         } else {
           mentionStringMap.put(mentionString, mentionsClusterMap.get(m).entity);
         }
@@ -172,7 +150,7 @@ public class RuleBased implements CoreferenceSystem {
         if (mentionsClusterMap.get(m).entity.mentions.size() == 1) {
           for (int i = doc.indexOfMention(m)-1; i >= 0; i--) {
             Mention neighborMention = doc.getMentions().get(i);
-            if (isAntecedent(m, neighborMention)) {
+            if (Util.isAntecedent(m, neighborMention)) {
               mergeClusters(mentionsClusterMap.get(m).entity, mentionsClusterMap.get(neighborMention).entity);
               break;
             }
@@ -182,19 +160,6 @@ public class RuleBased implements CoreferenceSystem {
     }
   }
 
-  private Boolean isAntecedent(Mention m, Mention neighborMention) {
-    if (Pronoun.isSomePronoun(neighborMention.gloss())) {
-      if (neighborMention.gloss().equals(m.gloss()) || ( Util.haveGenderAndAreSameGender(m, neighborMention).getSecond() &&
-                                                         Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond() && Util.areSamePerson(m, neighborMention))) {
-        return true;
-      }
-    } else if (Util.haveGenderAndAreSameGender(m, neighborMention).getSecond() && Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond()) {
-      return true;
-    } else if (Util.bothGenderNeutral(m, neighborMention) && Util.haveNumberAndAreSameNumber(m, neighborMention).getSecond()) {
-      return true;
-    }
-    return false;
-  }
 
   private void mergeClusters(Entity mergingEntity, Entity fixedEntity) {
     if (mergingEntity != fixedEntity) {
@@ -222,35 +187,5 @@ public class RuleBased implements CoreferenceSystem {
     clusteredMentionsList.addAll(mentionsClusterMap.values());
     return clusteredMentionsList;
   }
-
-
-/*
-    for (Sentence s : doc.sentences) {
-      System.out.println(s);
-      System.out.println("----");
-    }
-	  mentionsClusterMap = new HashMap<Mention, ClusteredMention>();
-    HashSet<Mention> singles = new HashSet<Mention>();
-    HashMap<String, Entity> exactMatchClusters = new HashMap<String, Entity>();
-    HashMap<String, Entity> hwClusters = new HashMap<String, Entity>();
-    HashMap<String, Entity> lClusters = new HashMap<String, Entity>();
-
-
-    System.out.println("\n\n\n-----------------------------HERE LIE THE EXPERIMENTS !!!!!!!!!!!!!");
-    System.out.println("EXPERIMENTS ARE OVEERRRRR ------------------------\n\n\n");
-
-    List<ClusteredMention> mentionList = new ArrayList<ClusteredMention>();
-    mentionList.addAll(mentions.values());
-    HashSet<Entity> entities = new HashSet<Entity>();
-    for (ClusteredMention cm : mentionList) {
-      entities.add(cm.entity);
-    }
-    for (Entity e : entities) {
-      System.out.println(e);
-    }
-    System.out.println("\n\nDONE\n\n");
-    return mentionsMapToClusterList();
-	}
-*/
 
 }

@@ -85,10 +85,6 @@ public interface Feature {
     }
   }
   
-  /*
-   * TODO: If necessary, add new feature types
-   */
-
   //-----------------------------------------------------------
   // REAL FEATURE TEMPLATES
   //-----------------------------------------------------------
@@ -100,9 +96,29 @@ public interface Feature {
   public static class ExactMatch extends Indicator {
     public ExactMatch(boolean exactMatch){ super(exactMatch); }
   }
-  
-  /*
-   * TODO: Add values to the indicators here.
-   */
 
+  public static class HeadWordLemmaMatch extends Indicator {
+    public HeadWordLemmaMatch(boolean headWordLemmaMatch){ super(headWordLemmaMatch); }
+  }
+
+  public static class BothPronouns extends Indicator {
+    public BothPronouns(boolean bothPronouns){ super(bothPronouns); }
+  }
+
+  public static class OnePronoun extends Indicator {
+    public OnePronoun(boolean onePronoun){ super(onePronoun); }
+  }
+
+  public static class Antecedent extends Indicator {
+    public Antecedent(boolean antecedent){ super(antecedent); }
+  }
+
+  public static class SentenceDistance extends IntIndicator {
+    public SentenceDistance(int sentenceDistance){ super(sentenceDistance); }
+  }
+
+  public static class MentionDistance extends IntIndicator {
+    public MentionDistance(int mentionDistance){ super(mentionDistance); }
+  }
+  
 }

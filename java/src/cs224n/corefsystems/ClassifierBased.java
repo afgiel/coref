@@ -29,11 +29,14 @@ public class ClassifierBased implements CoreferenceSystem {
 
 	private static final Set<Object> ACTIVE_FEATURES = mkSet(new Object[]{
 
-			/*
-			 * TODO: Create a set of active features
-			 */
-
-			Feature.ExactMatch.class,
+		  Feature.ExactMatch.class,
+      Feature.HeadWordLemmaMatch.class,
+      //Feature.BothPronouns.class,
+      //Feature.OnePronoun.class,
+      //Feature.Antecedent.class,
+      //Feature.SentenceDistance.class,
+      //Feature.MentionDistance.class,
+			Pair.make(Feature.Antecedent.class, Feature.MentionDistance.class),
 
 			//skeleton for how to create a pair feature
 			//Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
@@ -60,11 +63,26 @@ public class ClassifierBased implements CoreferenceSystem {
 			if(clazz.equals(Feature.ExactMatch.class)){
 				//(exact string match)
 				return new Feature.ExactMatch(onPrix.gloss().equals(candidate.gloss()));
-//			} else if(clazz.equals(Feature.NewFeature.class) {
-				/*
-				 * TODO: Add features to return for specific classes. Implement calculating values of features here.
-				 */
-			}
+      } else if (clazz.equals(Feature.HeadWordLemmaMatch.class)) {
+				return new Feature.HeadWordLemmaMatch(onPrix.sentence.lemmas.get(onPrix.headWordIndex).
+          equals(candidate.sentence.lemmas.get(candidate.headWordIndex)));
+      } else if (clazz.equals(Feature.BothPronouns.class)) {
+				return new Feature.BothPronouns(Pronoun.isSomePronoun(onPrix.gloss()) && Pronoun.isSomePronoun(candidate.gloss()));
+      } else if (clazz.equals(Feature.OnePronoun.class)) {
+				return new Feature.OnePronoun(Pronoun.isSomePronoun(onPrix.gloss()) || Pronoun.isSomePronoun(candidate.gloss()));
+      } else if (clazz.equals(Feature.Antecedent.class)) {
+        if (Pronoun.isSomePronoun(onPrix.gloss())) {
+          return new Feature.Antecedent(Util.isAntecedent(onPrix, candidate));
+        } else {
+          return new Feature.Antecedent(false);
+        }
+      } else if (clazz.equals(Feature.SentenceDistance.class)) {
+        int d = Math.abs(onPrix.doc.indexOfSentence(onPrix.sentence) - candidate.doc.indexOfSentence(candidate.sentence));
+        return new Feature.SentenceDistance(d);
+      } else if (clazz.equals(Feature.MentionDistance.class)) {
+        int d = Math.abs(onPrix.doc.indexOfMention(onPrix) - candidate.doc.indexOfMention(candidate));
+        return new Feature.MentionDistance(d);
+      }
 			else {
 				throw new IllegalArgumentException("Unregistered feature: " + clazz);
 			}
