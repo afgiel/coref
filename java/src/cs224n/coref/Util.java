@@ -55,4 +55,31 @@ public class Util {
     return Pair.make(false, false);
   }
 
+  public static Boolean hasAppositiveConstruction(Sentence sentence) {
+    Boolean hasPotential = false;
+    Boolean hasAppositive = false;
+    Boolean hasNounInBetween  = false;
+    Sentence.Token prevToken = null;
+    for (Sentence.Token token : sentence.tokens) {
+      if (hasPotential) {
+        if (hasNounInBetween) {
+          if (token.word().equals(",")) {
+            hasAppositive = true;
+          }
+        } else {
+          if (token.isNoun()) {
+            hasNounInBetween = true;
+          }
+        }
+      } else {
+        if (token.word().equals(",")) {
+          if (prevToken != null && prevToken.isNoun()) {
+            hasPotential = true;
+          }
+        }
+      }
+      prevToken = token;
+    }
+    return hasAppositive;
+  }
 }

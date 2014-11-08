@@ -4,6 +4,8 @@ import cs224n.coref.ClusteredMention;
 import cs224n.coref.Document;
 import cs224n.coref.Entity;
 import cs224n.coref.Mention;
+import cs224n.coref.Sentence;
+import cs224n.coref.Util;
 import cs224n.util.Pair;
 
 import java.util.ArrayList;
@@ -32,7 +34,9 @@ public class BaselineCoreferenceSystem implements CoreferenceSystem{
       //--Print the Document
       System.out.println(doc.prettyPrint(clusters));
       //--Iterate over mentions
+
       for(Mention m : mentions){
+        System.out.println(m.sentence);
         System.out.println(m);
       }
       //--Iterate Over Coreferent Mention Pairs
