@@ -122,29 +122,31 @@ public class RuleBased implements CoreferenceSystem {
       }
     }
     System.out.println("\n\n\n-----------------------------HERE LIE THE EXPERIMENTS !!!!!!!!!!!!!");
-    HashMap<String, List<Mention>> ppn = new HashMap<String, List<Mention>>();
+    HashMap<Pair<String, String>, List<Mention>> ppn = new HashMap<Pair<String, String>, List<Mention>>();
     for (Mention m : doc.getMentions()) {
       Sentence s = m.sentence; 
       for (int i = m.beginIndexInclusive; i < m.endIndexExclusive; i++) {
         Sentence.Token t = s.tokens.get(i);
-        String  w = s.words.get(i);
+        String w = s.words.get(i);
+        String ner = s.nerTags.get(i);
         if (t.isProperNoun()) {
-          if (ppn.containsKey(w)) {
-            ppn.get(w).add(m);
+          Pair<String, String> wNer = new Pair<String, String>(w, ner);
+          if (ppn.containsKey(wNer)) {
+            ppn.get(wNer).add(m);
           } else {
-            ppn.put(w, new ArrayList<Mention>());
-            ppn.get(w).add(m);
+            ppn.put(wNer, new ArrayList<Mention>());
+            ppn.get(wNer).add(m);
           }
         }
       }
     }
-    for (String w : ppn.keySet()) {
-      if (ppn.get(w).size() > 1) {
-        System.out.println(w);
-        System.out.println(ppn.get(w));
+    for (Pair<String, String> wNer : ppn.keySet()) {
+      if (ppn.get(wNer).size() > 1) {
+        System.out.println(wNer);
+        System.out.println(ppn.get(wNer));
         System.out.println("---");
         HashSet<Entity> toMerge = new HashSet<Entity>();
-        for (Mention mProp : ppn.get(w)) {
+        for (Mention mProp : ppn.get(wNer)) {
           toMerge.add(mentions.get(mProp).entity); 
         }
         while (toMerge.size() > 1) { 
