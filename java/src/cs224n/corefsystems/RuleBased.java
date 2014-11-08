@@ -57,6 +57,7 @@ public class RuleBased implements CoreferenceSystem {
     HashSet<Mention> singles = new HashSet<Mention>();
     HashMap<String, Entity> gClusters = new HashMap<String, Entity>();
     HashMap<String, Entity> hwClusters = new HashMap<String, Entity>();
+    HashMap<String, Entity> lClusters = new HashMap<String, Entity>();
     // First pass = exact matches 
     for (Mention m : doc.getMentions()) {
       String mentionString = m.gloss().toLowerCase();
@@ -76,10 +77,30 @@ public class RuleBased implements CoreferenceSystem {
         Entity newEntity = newCluster.entity;
         gClusters.put(mentionString, newEntity);
         hwClusters.put(m.headWord().toLowerCase(), newEntity);
+        lClusters.put(m.sentence.lemmas.get(m.headWordIndex), newEntity);
       }
     }
-    // Second Pass == extact head word matches
+    // Second Pass == head word lemma matches
     Set<Mention> singlesCopy = new HashSet();
+    singlesCopy.addAll(singles);
+    for (Mention m : singlesCopy) { 
+      if (! singles.contains(m)) continue;
+      String lemma = m.sentence.lemmas.get(m.headWordIndex);
+      if (lClusters.containsKey(lemma)) {
+        Entity e = lClusters.get(lemma);
+        Set<Mention> eMentions = e.mentions;
+        if (eMentions.size() == 1) {
+          for (Mention singleMention : eMentions) {
+            singles.remove(singleMention);
+          }
+        }
+        m.removeCoreference();
+        mentions.put(m, m.markCoreferent(e));
+        singles.remove(m);
+      }
+    }
+    // Third Pass == exact head word matches 
+    singlesCopy = new HashSet();
     singlesCopy.addAll(singles);
     for (Mention m : singlesCopy) { 
       if (! singles.contains(m)) continue;
@@ -96,7 +117,7 @@ public class RuleBased implements CoreferenceSystem {
         mentions.put(m, m.markCoreferent(e));
         singles.remove(m);
       }
-    }
+    } 
     // Third Pass == head matching from headMatches 
     singlesCopy = new HashSet();
     singlesCopy.addAll(singles);
@@ -121,6 +142,7 @@ public class RuleBased implements CoreferenceSystem {
         } 
       }
     }
+
     System.out.println("\n\n\n-----------------------------HERE LIE THE EXPERIMENTS !!!!!!!!!!!!!");
     HashMap<Pair<String, String>, List<Mention>> ppn = new HashMap<Pair<String, String>, List<Mention>>();
     for (Mention m : doc.getMentions()) {
